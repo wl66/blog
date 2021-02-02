@@ -1,0 +1,67 @@
+{% extends 'myadmin.html' %}
+{% block content %}
+<h2>更新文章</h2><br>
+<form>
+    {% csrf_token %}
+    <div class="form-group has-success">
+        <label for="a">文章标题</label>
+        <div class="row">
+          <div class="col-xs-5">
+            <input type="text" id="a" class="form-control" value="{{ret.title}}">
+          </div>
+        </div>
+    </div>
+    <div class="form-group has-success">
+        <label for="b">文章描述</label>
+        <input class="form-control input-lg" id="b" value="{{ret.desc}}">
+    </div>
+    <div class="form-group has-success">
+        <label for="c">文章内容</label>
+        <textarea class="form-control textarea"  required="required" id="c" rows="12" cols="90"  placeholder="{{ret.content}}"></textarea>
+    </div>
+    <div>
+        <label for="d">发布时间</label>&nbsp;&nbsp;
+        <input type="datetime-local" id="d" name="date" required="required">
+    </div>
+    <div class="form-group has-success">
+        <label>文章分类</label>
+        <div class="row">
+          <div class="col-xs-3">
+              <select class="form-control" id="e">
+                {% for category in category_list %}
+                <option>{{category.title}}</option>
+                {% endfor %}
+              </select>
+          </div>
+        </div>
+    </div>
+    <a href="/show/user" class="btn btn-success btn-lg active" role="button">Back</a>
+    <input type="button" id='save' value="Save" class="btn btn-success pull-right btn-primary btn-lg active">
+</form>
+<script src="/static/textareas/js/jquery-2.1.1.min.js"></script>
+<script src="/static/textareas/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="/static/textareas/dist/bootstrap3-wysihtml5.all.min.js"></script>
+<script type="text/javascript" src="/static/textareas/dist/locales/bootstrap-wysihtml5.zh-CN.js"></script>
+<script>
+  $('.textarea').wysihtml5({locale: "zh-CN"});
+</script>
+<script>
+    $('#save').click(function(){
+        $.ajax({
+            url:"",
+            type:"post",
+            data:{
+                "title":$('#a').val(),
+                "desc":$('#b').val(),
+                "content":$('#c').val(),
+                "create_time":$('#d').val(),
+                "category":$('#e').val(),
+                "csrfmiddlewaretoken":$('[name="csrfmiddlewaretoken"]').val()
+            },
+             success:function(data){
+                 location.href='/show/user'
+                 }
+        })
+    })
+</script>
+{% endblock %}

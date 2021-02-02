@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>博客系统 </title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<!-- Custom Theme files -->
+<link href="/static/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all">
+<link href="/static/css/snow.css" rel="stylesheet" type="text/css" media="all" />
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<link href="/static/bs/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<style>
+    #button_btn{
+        width:500px
+    }
+    .valid_code_img{
+        vertical-align:-10px
+    }
+</style>
+<!-- //Custom Theme files -->
+</head>
+<body>
+    <div class="snow-container">
+          <div class="snow foreground"></div>
+          <div class="snow foreground layered"></div>
+          <div class="snow middleground"></div>
+          <div class="snow middleground layered"></div>
+          <div class="snow background"></div>
+          <div class="snow background layered"></div>
+    </div>
+    <div class="top-buttons-agileinfo">
+        <a href="/login/"  class="active">登录</a><a href="/register/">注册</a>
+    </div>
+    <div class="main-agileits">
+<!--form-stars-here-->
+		<div class="form-w3-agile">
+			<h2 class="sub-agileits-w3layouts">登录</h2>
+			<form class="form-horizontal">
+                    {% csrf_token %}
+                    <div class="form-group has-default">
+                         <label class="col-sm-2 control-label">User</label>
+                         <div class="col-sm-10">
+                            <input type="text" id="user" class="form-control" placeholder="在此处输入用户名">
+                         </div>
+                    </div>
+                    <div class="form-group has-default">
+                        <label class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" id="pwd" class="form-control" placeholder="在此处输入密码">
+                        </div>
+                    </div>
+                    <div class="form-group has-default">
+                        <label class="col-sm-2 control-label">验证码</label>
+                        <div class="col-md-4">
+                            <input type="text" id="valid_code" class="form-control" placeholder="输入验证码">
+                        </div>
+                        <div class="col-md-6">
+                            <img width="150" height="34" id="shuaxin" src="/get_img/">
+                            <a href="#" class="valid_code_img">看不清，换一张</a>
+                        </div>
+                    </div>
+                <a href="/nrp/" class="forgot-w3layouts">忘记密码 ?</a>
+                <input type="button" id="button_btn" class="btn btn-default"  value="登录">
+                <p id="error"></p>
+            </form>
+            <p class="p-bottom-w3ls"><a href="/register/">这里注册</a>如果你还没有一个账号.</p>
+		</div>
+    </div>
+<!--//form-ends-here-->
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    //验证码的刷新
+    $(".valid_code_img").click(function(){
+        $("#shuaxin")[0].src+="?"
+    })
+</script>
+<script>
+    //登录验证
+    $("#button_btn").click(function(){
+        $.ajax({
+          url:"",
+          type:"post",
+          data:{
+              'user':$('#user').val(),
+              'pwd':$('#pwd').val(),
+              'valid_code':$('#valid_code').val(),
+              'csrfmiddlewaretoken':$("[name='csrfmiddlewaretoken']").val()
+          },
+          success:function(data){
+              console.log(data);
+              if (data.user){
+
+                  location.href='/index/'
+              }
+              else{
+                  $("#error").text(data.msg).css({"color":"red","margin-left":"10px"})
+                  setTimeout(function(){
+                     $('#error').text("")
+                     },3000)
+              }
+          }
+        })
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+.img1 {
+    width: 30px;
+    height: 30px;
+    margin-top:50px;
+    margin-left:750px;
+    margin-bottom:50px;
+    position:absolute;
+    z-index:1;
+}
+.img2{
+    width: 30px;
+    height: 30px;
+    margin-top:50px;
+    margin-left:750px;
+    margin-bottom:50px;
+    position:absolute;
+    z-index:2;
+}
+.dianzan_img span{
+    color:red;
+    font-size:18px;
+    font-weight:bold;
+    margin-top:58px;
+    margin-bottom:50px;
+    margin-left:785px;
+    position:absolute;
+}

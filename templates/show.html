@@ -1,0 +1,50 @@
+{% extends 'myadmin.html' %}
+{% block content %}
+{% csrf_token %}
+<div id="table">
+    <div class="add">
+        <a href="/create/user"><button type="button" class="btn btn-primary">新增</button></a>
+    </div>
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <th>文章编号</th>
+                <th>标题</th>
+                <th>发布时间</th>
+                <th>文章分类</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for article in ret  %}
+            <tr>
+                <td width="5%">{{article.pk}}</td>
+                <td width="15%">{{article.title}}</td>
+                <td width="10%">{{article.create_time|date:'Y-m-d H:i'}}</td>
+                <td width="10%">{{article.category}}</td>
+                <td width="10%">
+                    <span class="delete" id="{{article.pk}}"><strong>删除</strong></span>
+                    <a href="/update/{{article.pk}}"><span class="edit"><strong>编辑</strong></span></a>
+                </td>
+
+            </tr>
+        {% endfor %}
+       </tbody>
+    </table>
+    <script>
+    $(".delete").click(function(){
+        var article_pk=$(this).attr('id');
+        $.ajax({
+            url:"/delete/"+article_pk,
+            type:"get",
+            data:{
+                "article_pk":article_pk
+            },
+            success:function(data){
+               location.href=''
+            }
+        })
+    });
+</script>
+</div>
+{% endblock %}

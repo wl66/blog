@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+{% csrf_token %}
+<div>
+    <h3 class="text-center">{{article_obj.title}}</h3>
+    <div class="cont">
+        {{article_obj.content|safe}}
+    </div>
+    <div class="dianzan_img">
+        {% if not ArticleUpDown_obj.is_up %}
+        <img class="img1" src="/static/imgs/dianzan.png">
+        <img class="img2" src="/static/imgs/down_dianzan.png">
+        {% else %}
+        <img class="img2" src="/static/imgs/dianzan.png">
+        <img class="img1" src="/static/imgs/down_dianzan.png">
+        {% endif %}
+        <span class="img_span">{{article_obj.up_count}}</span>
+    </div>
+    <br><br><br><br><br>
+    <div class="pl_comments">
+        <p>评论列表</p>
+        <ul class="comment_list list-group">
+            {% for comment in  comment_list %}
+                <li class="list-group-item ">
+                    <div class="list-group-item-success">
+                        <div class="plb">
+                                <span>{{comment.user.username}}</span>&nbsp;&nbsp;
+                                <span>{{comment.create_time|date:"Y-m-d H:i"}}</span>&nbsp;&nbsp;
+                                <a  class="pull-right hf_btn" username="{{comment.user.username}}" comment_list_id="{{comment.pk}}">评论</a>
+                        </div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;{{comment.content}}</div>
+                   </div>
+                </li>
+
+            {% endfor %}
+        </ul>
+        <p><strong>写评论</strong></p>
+        <textarea id="text_connent" name="content" rows="10" cols="80" class="form-control"></textarea>
+        <p>
+            <button class="btn sub_btn comment_btn">提交评论</button>
+        </p>
+    </div>
+</div>
+<script>
+    $.ajax({
+        url:"/get_comment_tree/",
+        type:"get",
+        data:{"article_id":"{{article_obj.pk}}"},
+        success:function(data){
+
+            $.each(data,function(index,comment_obj){
+                var pk=comment_obj.pk;
+                var username=comment_obj.username;
+                var index=comment_obj.content.indexOf("\n");
+                var content =comment_obj.content.slice(index+1);
+                var create_time=comment_obj.create_time;
+                var parent_comment_id=comment_obj.parent_comment_id;
+                var s=`
+                 <div class="list-group-item-warning">
+                    <div>
+                        <span>${username}</span>
+                        <span>${create_time}</span>
+                        <a  class="pull-right hf_btn" username="${username}" comment_list_id="${pk}">评论</a>
+                    </div>
+                    <div>&nbsp;&nbsp;&nbsp;&nbsp;${content}</div>
+                 </div>`
+                $("[comment_list_id="+parent_comment_id+"]").parent().parent().append(s);
+                $('.list-group-item-warning').css('margin-left','20px');
+                $('.list-group-item-warning').css('margin-top','10px');
+            })
+
+        }
+
+
+    })
+</script>
+<script>
+    $('.dianzan_img img').click(function(){
+        $(this).css("z-index","-=2")
+        $.ajax({
+            url:"/digg/",
+            type:"post",
+            data:{
+                "csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val(),
+                 'article_id':{{article_obj.pk}}
+            },
+            success:function(data){
+               $(".img_span").text(data['data'])
+            }
+        })
+    })
+</script>
+<script>
+     var pid="";
+    $('.comment_btn').click(function(){
+        var content=$('#text_connent').val();
+        $.ajax({
+             url:"/comment/",
+             type:"post",
+             data:{
+                "csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val(),
+                "article_id":"{{article_obj.pk}}",
+                "content":content,
+                "pid":pid
+             },
+             success:function(data){
+                 var create_time=data.create_time
+                 var username=data.username
+                 var content=data.content
+                 var pid=data.pid
+                 if (!pid){
+                     var s=`
+                         <li class="list-group-item ">
+                             <div class="list-group-item-success">
+                                <div>
+                                    <span>${username}</span>&nbsp;&nbsp;
+                                    <span>${create_time}</span>&nbsp;&nbsp;
+                                </div>
+                                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${content}</div>
+                            </div>
+                        </li> `
+                      $('ul.comment_list').append(s);
+                }
+                 pid=""
+             }
+        })
+
+    });
+    $('body').on('click','.hf_btn',function(){
+        $("#text_connent").focus();
+            var xxx="@"+$(this).attr("username")+'\n';
+            $('#text_connent').val(xxx);
+            pid=$(this).attr("comment_list_id");
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/static/css/snow.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="/static/bs/dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <title>博客系统</title>
+    <style>
+        #avatar_img{
+            width:80px;
+            height:80px;
+            background:#ccc;
+            text-align:center;
+            border:3px solid #0000CD;
+            border-radius:50%;
+        }
+        #avatar{
+        display:none
+        }
+        #error{
+        color:red
+        }
+        .reg_btn{
+        width:490px;
+        height:40px
+       }
+       #ys{
+           color:white
+       }
+
+    </style>
+</head>
+<body>
+    <div class="snow-container">
+        <div class="snow foreground"></div>
+        <div class="snow foreground layered"></div>
+        <div class="snow middleground"></div>
+        <div class="snow middleground layered"></div>
+        <div class="snow background"></div>
+        <div class="snow background layered"></div>
+    </div>
+    <div class="top-buttons-agileinfo">
+        <a href="/login/">Sign In</a><a href="/register/" class="active">Sign Up</a>
+    </div>
+    <div class="main-agileits">
+        <div class="form-w3-agile">
+            <h2 class="sub-agileits-w3layouts">注册</h2>
+            <div class="form-group">
+                  <div class="form-group has-default">
+                <label for="avatar">
+                <img src="/static/imgs/default.jpg" id="avatar_img">
+                </label>
+                <input type="file" id="avatar">
+            </div>
+            <form id="form">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group has-default" id="ys">
+                        <label for="{{ field.auto_id }}" class="col-sm-2 control-label">{{field.label}}</label>
+                        <div class="col-sm-10">{{ field }}</div>
+                        <span id="error" class="pull-right"></span>
+                    </div>
+                {% endfor %}
+                <input type="button" class="reg_btn  btn-success" value="注册">
+            </form>
+        </div>
+    </div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $("#avatar").change(function(){
+        //获取用户选择的文件对象
+        var file_obj=$(this)[0].files[0];
+        //获取文件对象的路径
+        var reader=new FileReader();
+        reader.readAsDataURL(file_obj);
+        //修改img的src属性，src=文件对象的路径
+        reader.onload=function(){
+            $("#avatar_img").attr("src",reader.result)
+        };
+    })
+</script>
+<script>
+    //基于ajax提交数据
+    $(".reg_btn").click(function(){
+          var formdata=new FormData();
+          var request_data=$("#form").serializeArray();
+          $.each(request_data,function(index,data){
+              formdata.append(data.name,data.value)
+          });
+          //formdata.append("user",$("#id_user").val());
+          //formdata.append("pwd",$("#id_pwd").val());
+          //formdata.append("re_pwd",$("#id_re_pwd").val());
+          //formdata.append("email",$("#id_email").val());
+          //formdata.append("csrfmiddlewaretoken",$("[name='csrfmiddlewaretoken']").val());
+          formdata.append("avatar",$("#avatar")[0].files[0]);
+          $.ajax({
+              url:"",
+              type:"post",
+              contentType:false,
+              processData:false,
+              data:formdata,
+              success:function(data){
+                  if(data.user){
+                      //注册成功
+                      location.href='/login/'
+                  }
+                  else{
+                      //注册失败
+                      console.log(data.msg);
+                      //清空错误信息
+                      $("span#error").html("");
+                      $(".col-sm-10").removeClass("has-error");
+                      //展示错误信息
+                      $.each(data.msg,function(field,error_list){
+                          if (field=="__all__"){
+                              $("#id_re_pwd").parent().next().html(error_list[0]).parent().addClass("has-error");
+                          }
+                          $("#id_"+field).parent().next().html(error_list[0]);
+                          $("#id_"+field).parent().addClass("has-error");
+                          setTimeout(function(){
+                             $('span#error').text("")},3000)
+
+                      })
+                  }
+              }
+          })
+    })
+</script>
+</body>
+</html>
